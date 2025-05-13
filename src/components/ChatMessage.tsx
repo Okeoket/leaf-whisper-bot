@@ -2,12 +2,14 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Message } from '@/types';
+import DiseaseDetails from './DiseaseDetails';
 
 interface ChatMessageProps {
   message: Message;
+  onRequestLocation: (messageId: string) => void;
 }
 
-const ChatMessage = ({ message }: ChatMessageProps) => {
+const ChatMessage = ({ message, onRequestLocation }: ChatMessageProps) => {
   const isUser = message.role === 'user';
   
   return (
@@ -53,6 +55,27 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
                 className="rounded-md max-w-full h-auto object-cover"
               />
             </div>
+          )}
+          
+          {message.isLocationRequest && !isUser && (
+            <div className="mt-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => onRequestLocation(message.id)}
+                className="w-full bg-secondary/50 text-primary hover:bg-secondary hover:text-primary"
+              >
+                Cung cấp vị trí của bạn
+              </Button>
+            </div>
+          )}
+          
+          {message.diseaseInfo && !isUser && (
+            <DiseaseDetails 
+              diseaseInfo={message.diseaseInfo} 
+              weatherInfo={message.weatherInfo}
+              onRequestLocation={() => onRequestLocation(message.id)}
+            />
           )}
         </div>
       </div>
