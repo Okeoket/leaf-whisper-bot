@@ -34,7 +34,7 @@ const LocationDialog = ({ open, onOpenChange, onSubmit }: LocationDialogProps) =
         <DialogHeader>
           <DialogTitle>Nhập vị trí của bạn</DialogTitle>
           <DialogDescription>
-            Vui lòng cung cấp vị trí để nhận thông tin thời tiết và khuyến nghị điều trị phù hợp
+            Vui lòng cung cấp thành phố hoặc tỉnh để nhận thông tin thời tiết và khuyến nghị điều trị phù hợp
           </DialogDescription>
         </DialogHeader>
         

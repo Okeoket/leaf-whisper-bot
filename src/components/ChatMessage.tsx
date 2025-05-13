@@ -58,25 +58,26 @@ const ChatMessage = ({ message, onRequestLocation }: ChatMessageProps) => {
             </div>
           )}
           
-          {message.isLocationRequest && !isUser && (
-            <div className="mt-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => onRequestLocation(message.id)}
-                className="w-full bg-secondary/50 text-primary hover:bg-secondary hover:text-primary"
-              >
-                Cung cấp vị trí của bạn
-              </Button>
-            </div>
-          )}
-          
           {message.diseaseInfo && !isUser && (
             <DiseaseDetails 
               diseaseInfo={message.diseaseInfo} 
               weatherInfo={message.weatherInfo}
               onRequestLocation={() => onRequestLocation(message.id)}
             />
+          )}
+          
+          {message.isLocationRequest && !isUser && (
+            <div className="mt-3">
+              <p className="text-sm mb-2">Để nhận thông tin điều trị chính xác hơn, vui lòng cung cấp vị trí của bạn</p>
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => onRequestLocation(message.id)}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                Cung cấp vị trí của bạn
+              </Button>
+            </div>
           )}
         </div>
       </div>
