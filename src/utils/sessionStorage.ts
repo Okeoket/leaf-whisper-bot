@@ -85,6 +85,19 @@ export const addMessage = (sessionId: string, message: Message): void => {
   }
 };
 
+// Update a message in a session
+export const updateMessage = (sessionId: string, updatedMessage: Message): void => {
+  const session = getSession(sessionId);
+  if (session) {
+    const messageIndex = session.messages.findIndex(msg => msg.id === updatedMessage.id);
+    if (messageIndex !== -1) {
+      session.messages[messageIndex] = updatedMessage;
+      session.updatedAt = Date.now();
+      saveSession(session);
+    }
+  }
+};
+
 // Clear all sessions
 export const clearSessions = (): void => {
   localStorage.removeItem(STORAGE_KEY);

@@ -3,6 +3,7 @@ import React from 'react';
 import { cn } from "@/lib/utils";
 import { Message } from '@/types';
 import DiseaseDetails from './DiseaseDetails';
+import { Button } from '@/components/ui/button';
 
 interface ChatMessageProps {
   message: Message;
