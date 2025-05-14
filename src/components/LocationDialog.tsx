@@ -84,48 +84,50 @@ const LocationDialog = ({ open, onOpenChange, onSubmit }: LocationDialogProps) =
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vị trí (thành phố hoặc tỉnh)</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ví dụ: Hà Nội, TP. Hồ Chí Minh, Đà Nẵng..." {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          
-          <Button
-            type="button"
-            variant="outline"
-            onClick={getGeolocation}
-            disabled={isLoadingGeolocation}
-            className="w-full"
-          >
-            {isLoadingGeolocation ? (
-              <>
-                <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
-                Đang lấy vị trí...
-              </>
-            ) : (
-              "Tự động xác định vị trí"
-            )}
-          </Button>
-          
-          <div className="flex justify-end gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vị trí (thành phố hoặc tỉnh)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ví dụ: Hà Nội, TP. Hồ Chí Minh, Đà Nẵng..." {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <Button
+              type="button"
+              variant="outline"
+              onClick={getGeolocation}
+              disabled={isLoadingGeolocation}
+              className="w-full"
             >
-              Hủy
+              {isLoadingGeolocation ? (
+                <>
+                  <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
+                  Đang lấy vị trí...
+                </>
+              ) : (
+                "Tự động xác định vị trí"
+              )}
             </Button>
-            <Button type="submit">Xác nhận</Button>
-          </div>
-        </form>
+            
+            <div className="flex justify-end gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+              >
+                Hủy
+              </Button>
+              <Button type="submit">Xác nhận</Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
