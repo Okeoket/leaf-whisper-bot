@@ -127,15 +127,32 @@ export const useChat = (): UseChatResult => {
     setIsLoading(true);
 
     try {
-      // Get weather data
-      const weatherData = await getWeatherData(values.location);
+      // Call the backend API
+      const apiUrl = `/api/weather?location=${encodeURIComponent(values.location)}`;
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const weatherData = await response.json();
+      
+      // Format weather data for our app
+      const formattedWeatherData = {
+        location: weatherData.city,
+        temperature: weatherData.temperature,
+        humidity: 75, // Default value as it's not provided by the API
+        conditions: weatherData.condition,
+        suitable_for_treatment: true,
+        recommendation: `Dữ liệu thời tiết đã cập nhật cho ${weatherData.city} vào lúc ${new Date(weatherData.time).toLocaleTimeString()}`
+      };
       
       // Find the message to update
       const updatedMessages = messages.map(msg => {
         if (msg.id === currentMessageId) {
           return {
             ...msg,
-            weatherInfo: weatherData,
+            weatherInfo: formattedWeatherData,
             isLocationRequest: false
           };
         }
@@ -154,15 +171,48 @@ export const useChat = (): UseChatResult => {
 
       toast({
         title: "Thông tin thời tiết",
-        description: `Đã cập nhật thông tin thời tiết cho ${weatherData.location}`,
+        description: `Đã cập nhật thông tin thời tiết cho ${formattedWeatherData.location}`,
       });
     } catch (error) {
       console.error('Error getting weather data:', error);
-      toast({
-        title: "Lỗi",
-        description: "Không thể lấy thông tin thời tiết. Vui lòng thử lại.",
-        variant: "destructive"
-      });
+      
+      // Fallback to mock data if real API fails
+      try {
+        const weatherData = await getWeatherData(values.location);
+        
+        // Find the message to update
+        const updatedMessages = messages.map(msg => {
+          if (msg.id === currentMessageId) {
+            return {
+              ...msg,
+              weatherInfo: weatherData,
+              isLocationRequest: false
+            };
+          }
+          return msg;
+        });
+
+        // Update messages
+        setMessages(updatedMessages);
+        
+        // Update in session storage
+        updatedMessages.forEach(msg => {
+          if (msg.id === currentMessageId) {
+            SessionStorage.updateMessage(sessionId, msg);
+          }
+        });
+
+        toast({
+          title: "Thông tin thời tiết (dữ liệu mẫu)",
+          description: `Đã cập nhật thông tin thời tiết cho ${weatherData.location}`,
+        });
+      } catch (fallbackError) {
+        toast({
+          title: "Lỗi",
+          description: "Không thể lấy thông tin thời tiết. Vui lòng thử lại.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsLoading(false);
     }
