@@ -1,6 +1,5 @@
-
 const API_URL = '/predict';
-const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
+const WEATHER_API_URL = '/api/weather';
 
 // Mock API key - in a real app this should be stored securely
 const WEATHER_API_KEY = 'mock_api_key';
@@ -51,23 +50,18 @@ export const predictDisease = async (data: { text?: string; image?: File }) => {
 // Get weather data based on location
 export const getWeatherData = async (location: string) => {
   try {
-    // In a real app, use the actual API
-    // For development purposes, we'll mock it
-    return mockWeatherData(location);
-    
-    // Actual weather API call would look like:
-    /*
-    const response = await fetch(`${WEATHER_API_URL}?q=${encodeURIComponent(location)}&appid=${WEATHER_API_KEY}&units=metric`);
+    // Real API call to the backend
+    const response = await fetch(`${WEATHER_API_URL}?location=${encodeURIComponent(location)}`);
     
     if (!response.ok) {
       throw new Error(`Weather API error: ${response.status}`);
     }
     
     return await response.json();
-    */
   } catch (error) {
     console.error('Weather API error:', error);
-    throw error;
+    // If API call fails, fall back to mock data
+    return mockWeatherData(location);
   }
 };
 

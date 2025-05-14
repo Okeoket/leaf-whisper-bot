@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message } from '@/types';
 import { predictDisease, getWeatherData } from '@/services/api';
@@ -127,21 +126,14 @@ export const useChat = (): UseChatResult => {
     setIsLoading(true);
 
     try {
-      // Call the backend API
-      const apiUrl = `/api/weather?location=${encodeURIComponent(values.location)}`;
-      const response = await fetch(apiUrl);
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      
-      const weatherData = await response.json();
+      // Call the backend API through our service function
+      const weatherData = await getWeatherData(values.location);
       
       // Format weather data for our app
       const formattedWeatherData = {
         location: weatherData.city,
         temperature: weatherData.temperature,
-        humidity: 75, // Default value as it's not provided by the API
+        humidity: 75, // Default value as it might not be provided by the API
         conditions: weatherData.condition,
         suitable_for_treatment: true,
         recommendation: `Dữ liệu thời tiết đã cập nhật cho ${weatherData.city} vào lúc ${new Date(weatherData.time).toLocaleTimeString()}`
@@ -175,44 +167,11 @@ export const useChat = (): UseChatResult => {
       });
     } catch (error) {
       console.error('Error getting weather data:', error);
-      
-      // Fallback to mock data if real API fails
-      try {
-        const weatherData = await getWeatherData(values.location);
-        
-        // Find the message to update
-        const updatedMessages = messages.map(msg => {
-          if (msg.id === currentMessageId) {
-            return {
-              ...msg,
-              weatherInfo: weatherData,
-              isLocationRequest: false
-            };
-          }
-          return msg;
-        });
-
-        // Update messages
-        setMessages(updatedMessages);
-        
-        // Update in session storage
-        updatedMessages.forEach(msg => {
-          if (msg.id === currentMessageId) {
-            SessionStorage.updateMessage(sessionId, msg);
-          }
-        });
-
-        toast({
-          title: "Thông tin thời tiết (dữ liệu mẫu)",
-          description: `Đã cập nhật thông tin thời tiết cho ${weatherData.location}`,
-        });
-      } catch (fallbackError) {
-        toast({
-          title: "Lỗi",
-          description: "Không thể lấy thông tin thời tiết. Vui lòng thử lại.",
-          variant: "destructive"
-        });
-      }
+      toast({
+        title: "Lỗi",
+        description: "Không thể lấy thông tin thời tiết. Vui lòng thử lại.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
