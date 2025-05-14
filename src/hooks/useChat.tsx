@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Message } from '@/types';
 import { predictDisease, getWeatherData } from '@/services/api';
@@ -126,10 +127,10 @@ export const useChat = (): UseChatResult => {
     setIsLoading(true);
 
     try {
-      // Call the backend API through our service function
+      // Call the backend API - it will handle all weather data processing
       const weatherData = await getWeatherData(values.location);
       
-      // Format weather data for our app
+      // Format weather data for our app - just passing through what the backend provides
       const formattedWeatherData = {
         location: weatherData.city,
         temperature: weatherData.temperature,

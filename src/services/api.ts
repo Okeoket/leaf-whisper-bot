@@ -50,7 +50,7 @@ export const predictDisease = async (data: { text?: string; image?: File }) => {
 // Get weather data based on location
 export const getWeatherData = async (location: string) => {
   try {
-    // Real API call to the backend
+    // Simple API call to the backend
     const response = await fetch(`${WEATHER_API_URL}?location=${encodeURIComponent(location)}`);
     
     if (!response.ok) {
@@ -60,8 +60,7 @@ export const getWeatherData = async (location: string) => {
     return await response.json();
   } catch (error) {
     console.error('Weather API error:', error);
-    // If API call fails, fall back to mock data
-    return mockWeatherData(location);
+    throw error;
   }
 };
 
