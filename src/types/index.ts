@@ -18,9 +18,7 @@ export interface DiseaseInfo {
 }
 
 export interface TextQueryResponse {
-  disease: string;
-  query: string;
-  related_info: string;
+  message: string;
 }
 
 export interface WeatherInfo {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message } from '@/types';
 import { predictDisease, getWeatherData } from '@/services/api';
@@ -92,12 +91,12 @@ export const useChat = (): UseChatResult => {
         
         // Save to session storage
         SessionStorage.addMessage(sessionId, locationRequestMessage);
-      } else if (text && 'disease' in response) {
-        // Text response - show query result
+      } else if (text && 'message' in response) {
+        // Text response - show simple message
         const textResponseMessage: Message = {
           id: SessionStorage.generateId(),
           role: 'system',
-          content: `Thông tin thêm về bệnh ${response.disease}:\n\n${response.related_info}`,
+          content: response.message,
           timestamp: Date.now()
         };
 
@@ -149,12 +148,12 @@ export const useChat = (): UseChatResult => {
       
       // Format weather data for our app - just passing through what the backend provides
       const formattedWeatherData = {
-        location: weatherData.city,
-        temperature: weatherData.temperature,
-        humidity: 75, // Default value as it might not be provided by the API
-        conditions: weatherData.condition,
+        location: weatherData.city || values.location,
+        temperature: weatherData.temperature || 25,
+        humidity: 75,
+        conditions: weatherData.condition || 'Unknown',
         suitable_for_treatment: true,
-        recommendation: `Dữ liệu thời tiết đã cập nhật cho ${weatherData.city} vào lúc ${new Date(weatherData.time).toLocaleTimeString()}`
+        recommendation: weatherData.message || `Dữ liệu thời tiết đã cập nhật cho ${values.location}`
       };
       
       // Find the message to update
