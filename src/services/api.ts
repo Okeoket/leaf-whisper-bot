@@ -1,4 +1,6 @@
 
+import { DiseaseOrTextResponse } from '@/types';
+
 const API_URL = '/api/predict';
 const WEATHER_API_URL = '/api/weather';
 
@@ -7,55 +9,34 @@ interface PredictDiseaseParams {
   image?: File;
 }
 
-interface DiseaseResponse {
-  disease_name: string;
-  details: string;
-  treatment: string;
-  medications: string[];
-}
-
-interface TextQueryResponse {
-  message: string;
-}
-
-// Hàm gọi API để dự đoán bệnh (cho image) hoặc query text
-export const predictDisease = async ({ text, image }: PredictDiseaseParams): Promise<DiseaseResponse | TextQueryResponse> => {
+// Hàm gọi API để dự đoán bệnh
+export const predictDisease = async ({ text, image }: PredictDiseaseParams): Promise<DiseaseOrTextResponse> => {
   try {
-    let requestBody;
-    let headers = {};
-    
+    const formData = new FormData();
+
     if (image) {
-      // Image upload - use multipart/form-data
-      requestBody = new FormData();
-      requestBody.append('image', image);
-    } else if (text) {
-      // Text only - use JSON
-      requestBody = JSON.stringify({ text: text });
-      headers = {
-        'Content-Type': 'application/json'
-      };
-    } else {
-      throw new Error('Either text or image must be provided');
+      formData.append('image', image);
     }
-    
+
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers,
-      body: requestBody,
+      body: image ? formData : JSON.stringify({ text }),
+      headers: image ? undefined : {
+        'Content-Type': 'application/json',
+      },
     });
-    
+
     if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+      throw new Error('Lỗi khi gọi API');
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('API error:', error);
+    console.error('Lỗi khi dự đoán bệnh:', error);
     throw error;
   }
 };
 
-// Get weather data based on location
 export const getWeatherData = async (location: string) => {
   try {
     const response = await fetch(`${WEATHER_API_URL}?location=${encodeURIComponent(location)}`, {

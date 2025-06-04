@@ -17,9 +17,19 @@ export interface DiseaseInfo {
   medications: string[];
 }
 
-export interface TextQueryResponse {
-  message: string;
+export interface DiseaseResponse {
+  disease_name: string;
+  details: string;
+  treatment: string;
+  medications: string[];
 }
+
+export interface TextResponse {
+  disease: string;
+  info: string | string[];
+}
+
+export type DiseaseOrTextResponse = DiseaseResponse | TextResponse;
 
 export interface WeatherInfo {
   location: string;

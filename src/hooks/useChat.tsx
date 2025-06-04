@@ -74,8 +74,8 @@ export const useChat = (): UseChatResult => {
         image: image || undefined
       });
 
-      // Check if response is for image (DiseaseResponse) or text (TextQueryResponse)
-      if (image && 'disease_name' in response) {
+      // Check if response is for image (DiseaseResponse) or text (TextResponse)
+      if ('disease_name' in response) {
         // Image response - create location request system message
         const locationRequestMessage: Message = {
           id: SessionStorage.generateId(),
@@ -91,12 +91,12 @@ export const useChat = (): UseChatResult => {
         
         // Save to session storage
         SessionStorage.addMessage(sessionId, locationRequestMessage);
-      } else if (text && 'message' in response) {
+      } else if ('info' in response) {
         // Text response - show simple message
         const textResponseMessage: Message = {
           id: SessionStorage.generateId(),
           role: 'system',
-          content: response.message,
+          content: Array.isArray(response.info) ? response.info.join('\n') : response.info,
           timestamp: Date.now()
         };
 
