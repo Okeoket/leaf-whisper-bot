@@ -1,21 +1,38 @@
-const API_URL = '/predict';
+
+const API_URL = '/api/predict';
 const WEATHER_API_URL = '/api/weather';
 
-// Mock API key - in a real app this should be stored securely
-const WEATHER_API_KEY = 'mock_api_key';
+interface PredictDiseaseParams {
+  text?: string;
+  image?: File;
+}
 
-export const predictDisease = async (data: { text?: string; image?: File }) => {
+interface DiseaseResponse {
+  disease_name: string;
+  details: string;
+  treatment: string;
+  medications: string[];
+}
+
+interface TextQueryResponse {
+  disease: string;
+  query: string;
+  related_info: string;
+}
+
+// Hàm gọi API để dự đoán bệnh (cho image)
+export const predictDisease = async ({ text, image }: PredictDiseaseParams): Promise<DiseaseResponse | TextQueryResponse> => {
   try {
     let requestBody;
     let headers = {};
     
-    if (data.image) {
+    if (image) {
       // Image upload - use multipart/form-data
       requestBody = new FormData();
-      requestBody.append('image', data.image);
-    } else if (data.text) {
+      requestBody.append('image', image);
+    } else if (text) {
       // Text only - use JSON
-      requestBody = JSON.stringify({ text: data.text });
+      requestBody = JSON.stringify({ text: text });
       headers = {
         'Content-Type': 'application/json'
       };
@@ -23,12 +40,6 @@ export const predictDisease = async (data: { text?: string; image?: File }) => {
       throw new Error('Either text or image must be provided');
     }
     
-    // For development and demo purposes, mock API response
-    // In a real app, replace this with actual fetch API call
-    return mockApiResponse(data);
-    
-    // Actual API call would look like this:
-    /*
     const response = await fetch(API_URL, {
       method: 'POST',
       headers,
@@ -40,7 +51,6 @@ export const predictDisease = async (data: { text?: string; image?: File }) => {
     }
     
     return await response.json();
-    */
   } catch (error) {
     console.error('API error:', error);
     throw error;
@@ -162,51 +172,4 @@ const mockApiResponse = async (data: { text?: string; image?: File }) => {
   }
   
   return diseaseInfo;
-};
-
-// Mock weather data
-const mockWeatherData = async (location: string) => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Return mock data based on location
-  const normalizedLocation = location.toLowerCase();
-  
-  if (normalizedLocation.includes("hanoi") || normalizedLocation.includes("hà nội")) {
-    return {
-      location: "Hà Nội",
-      temperature: 32,
-      humidity: 80,
-      conditions: "Mưa nhẹ",
-      suitable_for_treatment: true,
-      recommendation: "Thời tiết có mưa nhẹ, thích hợp cho các biện pháp xử lý bệnh. Lưu ý đợi lúc tạnh mưa để phun thuốc."
-    };
-  } else if (normalizedLocation.includes("ho chi minh") || normalizedLocation.includes("hồ chí minh") || normalizedLocation.includes("saigon") || normalizedLocation.includes("sài gòn")) {
-    return {
-      location: "Hồ Chí Minh",
-      temperature: 34,
-      humidity: 75,
-      conditions: "Nắng, có mây",
-      suitable_for_treatment: true,
-      recommendation: "Thời tiết nắng nhẹ, thích hợp cho việc phun thuốc vào buổi sáng sớm hoặc chiều muộn."
-    };
-  } else if (normalizedLocation.includes("da nang") || normalizedLocation.includes("đà nẵng")) {
-    return {
-      location: "Đà Nẵng",
-      temperature: 30,
-      humidity: 85,
-      conditions: "Mưa dông",
-      suitable_for_treatment: false,
-      recommendation: "Thời tiết hiện tại có mưa dông, không thích hợp cho việc phun thuốc. Nên đợi thời tiết ổn định hơn."
-    };
-  } else {
-    return {
-      location: location,
-      temperature: 29,
-      humidity: 78,
-      conditions: "Nhiều mây",
-      suitable_for_treatment: true,
-      recommendation: "Thời tiết ổn định, có thể tiến hành các biện pháp xử lý bệnh."
-    };
-  }
 };

@@ -75,21 +75,38 @@ export const useChat = (): UseChatResult => {
         image: image || undefined
       });
 
-      // Create location request system message
-      const locationRequestMessage: Message = {
-        id: SessionStorage.generateId(),
-        role: 'system',
-        content: `Kết quả chẩn đoán: ${response.disease_name}`,
-        timestamp: Date.now(),
-        diseaseInfo: response,
-        isLocationRequest: true
-      };
+      // Check if response is for image (DiseaseResponse) or text (TextQueryResponse)
+      if (image && 'disease_name' in response) {
+        // Image response - create location request system message
+        const locationRequestMessage: Message = {
+          id: SessionStorage.generateId(),
+          role: 'system',
+          content: `Kết quả chẩn đoán: ${response.disease_name}`,
+          timestamp: Date.now(),
+          diseaseInfo: response,
+          isLocationRequest: true
+        };
 
-      // Update UI with location request message
-      setMessages(prev => [...prev, locationRequestMessage]);
-      
-      // Save to session storage
-      SessionStorage.addMessage(sessionId, locationRequestMessage);
+        // Update UI with location request message
+        setMessages(prev => [...prev, locationRequestMessage]);
+        
+        // Save to session storage
+        SessionStorage.addMessage(sessionId, locationRequestMessage);
+      } else if (text && 'disease' in response) {
+        // Text response - show query result
+        const textResponseMessage: Message = {
+          id: SessionStorage.generateId(),
+          role: 'system',
+          content: `Thông tin thêm về bệnh ${response.disease}:\n\n${response.related_info}`,
+          timestamp: Date.now()
+        };
+
+        // Update UI with text response message
+        setMessages(prev => [...prev, textResponseMessage]);
+        
+        // Save to session storage
+        SessionStorage.addMessage(sessionId, textResponseMessage);
+      }
     } catch (error) {
       console.error('Error getting prediction:', error);
       toast({

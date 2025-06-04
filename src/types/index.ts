@@ -17,6 +17,12 @@ export interface DiseaseInfo {
   medications: string[];
 }
 
+export interface TextQueryResponse {
+  disease: string;
+  query: string;
+  related_info: string;
+}
+
 export interface WeatherInfo {
   location: string;
   temperature: number;
