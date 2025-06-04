@@ -91,12 +91,12 @@ export const useChat = (): UseChatResult => {
         
         // Save to session storage
         SessionStorage.addMessage(sessionId, locationRequestMessage);
-      } else if ('info' in response) {
-        // Text response - show simple message
+      } else if ('related_info' in response) {
+        // Text response - show simple message like weather response
         const textResponseMessage: Message = {
           id: SessionStorage.generateId(),
           role: 'system',
-          content: Array.isArray(response.info) ? response.info.join('\n') : response.info,
+          content: Array.isArray(response.related_info) ? response.related_info.join('\n') : response.related_info,
           timestamp: Date.now()
         };
 

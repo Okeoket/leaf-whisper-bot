@@ -26,7 +26,8 @@ export interface DiseaseResponse {
 
 export interface TextResponse {
   disease: string;
-  info: string | string[];
+  query: string;
+  related_info: string | string[];
 }
 
 export type DiseaseOrTextResponse = DiseaseResponse | TextResponse;
