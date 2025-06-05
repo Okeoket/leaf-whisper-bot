@@ -24,11 +24,11 @@ export interface DiseaseResponse {
   medications: string[];
 }
 
-export interface TextResponse {
-  [key: string]: any;
+export interface MessageResponse {
+  message: string;
 }
 
-export type DiseaseOrTextResponse = DiseaseResponse | TextResponse;
+export type DiseaseOrTextResponse = DiseaseResponse | MessageResponse;
 
 export interface WeatherInfo {
   location: string;

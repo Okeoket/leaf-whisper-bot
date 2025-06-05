@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Message } from '@/types';
 import { predictDisease, getWeatherData } from '@/services/api';
@@ -74,7 +75,7 @@ export const useChat = (): UseChatResult => {
         image: image || undefined
       });
 
-      // Check if response is for image (DiseaseResponse) or text (TextResponse)
+      // Check if response has disease_name (image response) or message (text response)
       if ('disease_name' in response) {
         // Image response - create location request system message
         const locationRequestMessage: Message = {
@@ -91,12 +92,12 @@ export const useChat = (): UseChatResult => {
         
         // Save to session storage
         SessionStorage.addMessage(sessionId, locationRequestMessage);
-      } else {
-        // Text response - show backend JSON as is
+      } else if ('message' in response) {
+        // Text response - show message from Gemini API
         const textResponseMessage: Message = {
           id: SessionStorage.generateId(),
           role: 'system',
-          content: JSON.stringify(response, null, 2),
+          content: response.message,
           timestamp: Date.now()
         };
 
@@ -143,50 +144,32 @@ export const useChat = (): UseChatResult => {
     setIsLoading(true);
 
     try {
-      // Call the backend API - it will handle all weather data processing
+      // Call the backend API - it returns { message: location }
       const weatherData = await getWeatherData(values.location);
       
-      // Format weather data for our app - just passing through what the backend provides
-      const formattedWeatherData = {
-        location: weatherData.city || values.location,
-        temperature: weatherData.temperature || 25,
-        humidity: 75,
-        conditions: weatherData.condition || 'Unknown',
-        suitable_for_treatment: true,
-        recommendation: weatherData.message || `Dữ liệu thời tiết đã cập nhật cho ${values.location}`
+      // Create system message with the response
+      const weatherMessage: Message = {
+        id: SessionStorage.generateId(),
+        role: 'system',
+        content: weatherData.message || `Đã nhận vị trí: ${values.location}`,
+        timestamp: Date.now()
       };
-      
-      // Find the message to update
-      const updatedMessages = messages.map(msg => {
-        if (msg.id === currentMessageId) {
-          return {
-            ...msg,
-            weatherInfo: formattedWeatherData,
-            isLocationRequest: false
-          };
-        }
-        return msg;
-      });
 
       // Update messages
-      setMessages(updatedMessages);
+      setMessages(prev => [...prev, weatherMessage]);
       
-      // Update in session storage
-      updatedMessages.forEach(msg => {
-        if (msg.id === currentMessageId) {
-          SessionStorage.updateMessage(sessionId, msg);
-        }
-      });
+      // Save to session storage
+      SessionStorage.addMessage(sessionId, weatherMessage);
 
       toast({
-        title: "Thông tin thời tiết",
-        description: `Đã cập nhật thông tin thời tiết cho ${formattedWeatherData.location}`,
+        title: "Thông tin vị trí",
+        description: `Đã cập nhật vị trí: ${values.location}`,
       });
     } catch (error) {
       console.error('Error getting weather data:', error);
       toast({
         title: "Lỗi",
-        description: "Không thể lấy thông tin thời tiết. Vui lòng thử lại.",
+        description: "Không thể lấy thông tin vị trí. Vui lòng thử lại.",
         variant: "destructive"
       });
     } finally {
