@@ -3,6 +3,7 @@ import React from 'react';
 import { cn } from "@/lib/utils";
 import { Message } from '@/types';
 import DiseaseDetails from './DiseaseDetails';
+import MarkdownContent from './MarkdownContent';
 import { Button } from '@/components/ui/button';
 
 interface ChatMessageProps {
@@ -46,7 +47,12 @@ const ChatMessage = ({ message, onRequestLocation }: ChatMessageProps) => {
             ? "bg-primary text-primary-foreground rounded-tr-none" 
             : "bg-secondary text-secondary-foreground rounded-tl-none"
         )}>
-          {message.content}
+          {/* Check if it's a long formatted message from system */}
+          {!isUser && message.content.length > 200 && message.content.includes('**') ? (
+            <MarkdownContent content={message.content} />
+          ) : (
+            message.content
+          )}
           
           {message.image && (
             <div className="mt-2 max-w-xs">
